@@ -9,6 +9,10 @@ dependencies = [
     "pydantic>=2.10.6",
 ]
 
+[project.scripts]
+server = "litestar_project.server:run"
+test = "scripts.test:run"
+
 [dependency-groups]
 dev = [
     "click>=8.1.8",
@@ -21,4 +25,4 @@ dev = [
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
-packages = ["src/litestar_project"]
+packages = ["src/litestar_project", "src/scripts"]
