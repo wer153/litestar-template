@@ -1,33 +1,42 @@
-# litestar_project
+# Litestar Project Template
 
-## Overview
+A production-ready template for building scalable web applications using [Litestar](https://www.litestar.dev) and [Pydantic](https://pydantic-docs.helpmanual.io).
 
-litestar_project is a template project built using the [Litestar](https://www.litestar.dev) framework and [Pydantic](https://pydantic-docs.helpmanual.io). It is designed to kickstart development of scalable and performant web applications.
+## Quick Start
 
-## Project Structure
+1. Install UV:
+   ```bash
+   brew install uv
+   ```
 
-The repository is organized as follows:
+2. Set up environment:
+   ```bash
+   cp .env.example .env
+   uv sync
+   ```
 
-- **src/litestar_project/**: Contains the main application code.
-- **src/scripts/**: Contains utility scripts, including a test runner (invoked as described below).
+3. Start database and run migrations:
+   ```bash
+   ./src/scripts/setup-test.sh
+   uv run prisma migrate dev
+   ```
 
-Other important files include:
+4. Run the server:
+   ```bash
+   uv run server
+   ```
 
-- **.gitignore**: Specifies files and directories to ignore in version control.
-- **.python-version**: Specifies the required Python version (3.12).
-- **pyproject.toml**: Contains project configuration, dependencies, and build settings.
-- **uv.lock**: Lock file with exact dependency versions.
+## Development Guide
 
-## Requirements
+### Prerequisites
 
 - Python 3.12 or higher
-- Dependencies managed via Hatchling, as specified in [pyproject.toml](pyproject.toml)
-- UV as a package manager, as specified in [pyproject.toml](pyproject.toml)
 - PostgreSQL database
+- UV package manager
 
-## Environment Configuration
+### Environment Setup
 
-The application uses environment variables for configuration. Create a `.env` file in the root directory with the following settings:
+Create a `.env` file with the following configuration:
 
 ```env
 # Database Configuration
@@ -39,94 +48,73 @@ HOST=0.0.0.0
 PORT=8000
 ```
 
-### Database Setup
+#### Environment Variables
 
-1. Local Development:
-   ```bash
-   # Start PostgreSQL using Docker
-   ./src/scripts/setup-test.sh
-   
-   # Apply database migrations
-   uv run prisma migrate dev
-   ```
+| Variable      | Description                           | Required | Default     |
+|--------------|---------------------------------------|----------|-------------|
+| DATABASE_URL | Primary database connection URL       | Yes      | -           |
+| DIRECT_URL   | Direct database connection (Prisma)   | Yes      | -           |
+| HOST         | Server host address                   | No       | 0.0.0.0     |
+| PORT         | Server port                           | No       | 8000        |
 
-2. Production:
-   - Ensure PostgreSQL is running and accessible
-   - Set proper DATABASE_URL and DIRECT_URL in environment
-   - Run migrations: `uv run prisma migrate deploy`
+### Database Management
 
-### Environment Variables
+#### Local Development
+```bash
+# Start PostgreSQL
+./src/scripts/setup-test.sh
 
-| Variable      | Description                           | Default               | Required |
-|--------------|---------------------------------------|----------------------|----------|
-| DATABASE_URL | Primary database connection URL       | -                    | Yes      |
-| DIRECT_URL   | Direct database connection (for Prisma) | -                  | Yes      |
-| ENV          | Environment name                      | development          | No       |
+# Create migration
+uv run prisma migrate dev --name <migration_name>
 
-## Getting Started
+# Apply migrations
+uv run prisma migrate deploy
 
-### Setup
+# Reset database (dev only)
+uv run prisma migrate reset
+```
 
-- Install uv via Homebrew:
-  ```bash
-  brew install uv
-  ```
+#### Production Setup
+- Ensure PostgreSQL is accessible
+- Configure DATABASE_URL and DIRECT_URL
+- Run `uv run prisma migrate deploy`
 
-- Sync dependencies:
-  ```bash
-  uv sync
-  ```
-
-- Set up environment:
-  ```bash
-  cp .env.example .env  # Copy example env file
-  # Edit .env with your settings
-  ```
-
-### Run the server
-  ```bash
-  uv run server
-  ```
-
-### Test
-  ```bash
-  uv test --mypy --ruff --pytest
-  ```
-
-## Development
-
-### Database Migrations
-
-1. Create a new migration:
-   ```bash
-   uv run prisma migrate dev --name <migration_name>
-   ```
-
-2. Apply pending migrations:
-   ```bash
-   uv run prisma migrate deploy
-   ```
-
-3. Reset database (development only):
-   ```bash
-   uv run prisma migrate reset
-   ```
-
-### Code Style
-
-The project uses:
-- Ruff for linting and formatting
-- MyPy for type checking
-- Pytest for testing
+### Testing and Quality
 
 Run all checks:
 ```bash
 uv test --mypy --ruff --pytest
 ```
 
-## System Architecture
+The project uses:
+- **Ruff**: Linting and formatting
+- **MyPy**: Type checking
+- **Pytest**: Testing
 
-The system is built using AWS services and Supabase for persistence. Here's the system architecture:
+## Project Structure
+
+```
+.
+├── src/
+│   ├── litestar_project/  # Main application code
+│   └── scripts/           # Utility scripts
+├── tests/                 # Test suite
+├── .env.example          # Environment template
+├── .python-version       # Python version spec
+├── pyproject.toml        # Project configuration
+└── uv.lock              # Dependency lock file
+```
+
+## Deployment
+
+### Infrastructure Overview
+
+The application is deployed on AWS using:
+- **Route53**: DNS management
+- **API Gateway/ELB**: Load balancing
+- **ECS**: Container orchestration
+- **ECR**: Container registry
+- **Supabase**: Database service
 
 ```mermaid
 graph LR
@@ -155,16 +143,9 @@ graph LR
     container --> supabase
 ```
 
-### Component Overview
+### CI/CD Pipeline
 
-- **Route53**: DNS management and routing
-- **Elastic Load Balancer**: API Gateway and load distribution
-- **ECS**: Container orchestration and application hosting
-- **Supabase**: Database and persistence layer
-
-## Deployment Architecture
-
-The project uses AWS ECS for container orchestration with a GitHub Actions-based CI/CD pipeline. Here's the deployment flow:
+Automated deployment using GitHub Actions:
 
 ```mermaid
 architecture-beta
@@ -190,12 +171,10 @@ architecture-beta
     ecs_service:L --> R:ecs_container
 ```
 
-### CI/CD Process
+#### Deployment Process
 
-When a manual release is triggered:
-
-1. GitHub Actions workflow is initiated
-2. Workflow assumes an IAM role in AWS
-3. Container image is built and pushed to ECR
-4. ECS service is updated with the new container image
-5. ECS deploys the new container
+1. Trigger deployment via GitHub Actions
+2. AWS IAM role assumption
+3. Build and push container to ECR
+4. Update ECS service
+5. Deploy new container version
