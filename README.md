@@ -48,6 +48,44 @@ Other important files include:
   uv test --mypy --ruff --pytest
   ```
 
+## System Architecture
+
+The system is built using AWS services and Supabase for persistence. Here's the system architecture:
+
+```mermaid
+graph LR
+    subgraph aws[AWS]
+        subgraph dns[Domain Name Service]
+            routeer[Route53]
+        end
+        
+        subgraph lb[API Gateway]
+            elb[Elastic Load Balancer]
+        end
+        
+        subgraph ecs[Application Server]
+            service[ECS Service]
+            container[Container]
+        end
+    end
+    
+    subgraph ext[External Services]
+        supabase[(Supabase DB)]
+    end
+    
+    routeer --> elb
+    elb --> service
+    service --> container
+    container --> supabase
+```
+
+### Component Overview
+
+- **Route53**: DNS management and routing
+- **Elastic Load Balancer**: API Gateway and load distribution
+- **ECS**: Container orchestration and application hosting
+- **Supabase**: Database and persistence layer
+
 ## Deployment Architecture
 
 The project uses AWS ECS for container orchestration with a GitHub Actions-based CI/CD pipeline. Here's the deployment flow:
