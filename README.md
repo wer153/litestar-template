@@ -23,6 +23,45 @@ Other important files include:
 - Python 3.12 or higher
 - Dependencies managed via Hatchling, as specified in [pyproject.toml](pyproject.toml)
 - UV as a package manager, as specified in [pyproject.toml](pyproject.toml)
+- PostgreSQL database
+
+## Environment Configuration
+
+The application uses environment variables for configuration. Create a `.env` file in the root directory with the following settings:
+
+```env
+# Database Configuration
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/test
+DIRECT_URL=postgresql://postgres:postgres@localhost:5432/test
+
+# Server Configuration
+HOST=0.0.0.0
+PORT=8000
+```
+
+### Database Setup
+
+1. Local Development:
+   ```bash
+   # Start PostgreSQL using Docker
+   ./src/scripts/setup-test.sh
+   
+   # Apply database migrations
+   uv run prisma migrate dev
+   ```
+
+2. Production:
+   - Ensure PostgreSQL is running and accessible
+   - Set proper DATABASE_URL and DIRECT_URL in environment
+   - Run migrations: `uv run prisma migrate deploy`
+
+### Environment Variables
+
+| Variable      | Description                           | Default               | Required |
+|--------------|---------------------------------------|----------------------|----------|
+| DATABASE_URL | Primary database connection URL       | -                    | Yes      |
+| DIRECT_URL   | Direct database connection (for Prisma) | -                  | Yes      |
+| ENV          | Environment name                      | development          | No       |
 
 ## Getting Started
 
@@ -38,6 +77,12 @@ Other important files include:
   uv sync
   ```
 
+- Set up environment:
+  ```bash
+  cp .env.example .env  # Copy example env file
+  # Edit .env with your settings
+  ```
+
 ### Run the server
   ```bash
   uv run server
@@ -47,6 +92,37 @@ Other important files include:
   ```bash
   uv test --mypy --ruff --pytest
   ```
+
+## Development
+
+### Database Migrations
+
+1. Create a new migration:
+   ```bash
+   uv run prisma migrate dev --name <migration_name>
+   ```
+
+2. Apply pending migrations:
+   ```bash
+   uv run prisma migrate deploy
+   ```
+
+3. Reset database (development only):
+   ```bash
+   uv run prisma migrate reset
+   ```
+
+### Code Style
+
+The project uses:
+- Ruff for linting and formatting
+- MyPy for type checking
+- Pytest for testing
+
+Run all checks:
+```bash
+uv test --mypy --ruff --pytest
+```
 
 ## System Architecture
 
