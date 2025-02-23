@@ -28,6 +28,4 @@ def run(mypy: bool = False, pytest: bool = False, ruff: bool = False):
         click.echo("Running ruff linting...")
         _run(["ruff", "check"])
 
-
     click.echo("All checks passed successfully!")
-
