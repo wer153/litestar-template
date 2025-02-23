@@ -8,6 +8,7 @@ dependencies = [
     "litestar[standard]>=2.14.0",
     "prisma>=0.15.0",
     "pydantic>=2.10.6",
+    "pydantic-settings>=2.8.0",
 ]
 
 [project.scripts]

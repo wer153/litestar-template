@@ -1,7 +1,7 @@
 import uvicorn
 from litestar_project.app import create_app
-
+from litestar_project.settings import server_settings
 
 def run():
     app = create_app()
-    uvicorn.run(app, host="0.0.0.0", port=8001)
+    uvicorn.run(app, host=server_settings.host, port=server_settings.port)
