@@ -47,3 +47,41 @@ Other important files include:
   ```bash
   uv test --mypy --ruff --pytest
   ```
+
+## Deployment Architecture
+
+The project uses AWS ECS for container orchestration with a GitHub Actions-based CI/CD pipeline. Here's the deployment flow:
+
+```mermaid
+architecture-beta
+    
+    group aws(cloud)[aws]
+    group ecs(cloud)[ECS] in aws
+    service ecs_service(server)[ECS Service] in ecs
+    service ecs_container(server)[ECS Container] in ecs
+
+    group iam(server)[IAM] in aws
+    service role(server)[Assume Role] in iam
+
+    group ecr(database)[ECR] in aws
+    service registry(database)[Container Registry] in ecr
+
+    group github(cloud)[GitHub]
+    service actions(server)[GitHub Actions] in github
+
+    
+    actions:R --> L:role
+    role:R --> L:registry
+    registry:R --> L:ecs_service
+    ecs_service:L --> R:ecs_container
+```
+
+### CI/CD Process
+
+When a manual release is triggered:
+
+1. GitHub Actions workflow is initiated
+2. Workflow assumes an IAM role in AWS
+3. Container image is built and pushed to ECR
+4. ECS service is updated with the new container image
+5. ECS deploys the new container
