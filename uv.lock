@@ -248,6 +248,7 @@ version = "0.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "litestar", extra = ["standard"] },
+    { name = "prisma" },
     { name = "pydantic" },
 ]
 
@@ -263,6 +264,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "litestar", extras = ["standard"], specifier = ">=2.14.0" },
+    { name = "prisma", specifier = ">=0.15.0" },
     { name = "pydantic", specifier = ">=2.10.6" },
 ]
 
